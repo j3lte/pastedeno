@@ -29,12 +29,11 @@ jobs:
       - name: Coverage
         run: deno task coverage
 
-    # Disabled for now
-    #   - name: Upload coverage reports to Codecov
-    #     uses: codecov/codecov-action@v3
-    #     with:
-    #       token: ${{ secrets.CODECOV_TOKEN }}
-    #       file: ./.coverage/coverage.lcov
-    #       flags: unittests
-    #       name: codecov-umbrella
-    #       fail_ci_if_error: true
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./.coverage/coverage.lcov
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
