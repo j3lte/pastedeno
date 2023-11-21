@@ -27,6 +27,22 @@ Pastebin Client for Deno/Node
 
 API Docs can be found on Deno Docs: [https://deno.land/x/pastedeno/mod.ts](https://deno.land/x/pastedeno/mod.ts)
 
+## Installation
+
+### Deno
+
+```ts
+import { Pastebin } from "https://deno.land/x/pastedeno/mod.ts";
+```
+
+### Node
+
+Run `npm install pastedeno` or `yarn add pastedeno`
+
+```ts
+import { Pastebin } from "pastedeno";
+```
+
 ## Usage
 
 ```ts
