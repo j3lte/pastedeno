@@ -437,7 +437,6 @@ export abstract class AbstractPastebin {
       }
       return this.#handleResponse(res);
     } catch (error) {
-      console.log("error", error);
       return Promise.reject(error);
     }
   }
