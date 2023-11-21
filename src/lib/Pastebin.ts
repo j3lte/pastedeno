@@ -26,7 +26,7 @@ const formatTypeArr: FormatType[] = [
 const expirationTimeArr: string[] = Object.values(ExpirationTime);
 
 export abstract class AbstractPastebin {
-  #config: IPastebinOptions;
+  private _config: IPastebinOptions;
 
   // We're able to overwrite fetch because it is an abstract class
   fetch = globalThis.fetch;
@@ -35,11 +35,11 @@ export abstract class AbstractPastebin {
   requestTimeout = 4000;
 
   // DEBUG
-  #debug = false;
+  private _debug = false;
 
   constructor(config?: IPastebinOptions | string | null) {
     if (isUndefined(config) || isNull(config)) {
-      this.#config = {};
+      this._config = {};
       return;
     }
 
@@ -48,10 +48,10 @@ export abstract class AbstractPastebin {
       conf = { api_dev_key: conf };
     }
 
-    this.#debug = conf.debug === true;
+    this._debug = conf.debug === true;
     delete conf.debug;
 
-    this.#config = Object.assign({
+    this._config = Object.assign({
       api_dev_key: null,
       api_user_key: null,
       api_user_name: null,
@@ -60,7 +60,7 @@ export abstract class AbstractPastebin {
   }
 
   setDebug(debug: boolean): void {
-    this.#debug = debug;
+    this._debug = debug;
   }
 
   /**
@@ -82,19 +82,19 @@ export abstract class AbstractPastebin {
       return Promise.reject(new Error("Invalid paste url or id"));
     }
     if (isPrivate) {
-      const params = this.#createParams("show_paste");
+      const params = this._createParams("show_paste");
       params.api_paste_key = ID;
       try {
-        await this.#createAPIuserKey();
+        await this._createAPIuserKey();
         params.api_user_key = this.config.api_user_key as string;
 
-        return this.#postRequest(ENDPOINTS.APIRAW, params);
+        return this._postRequest(ENDPOINTS.APIRAW, params);
       } catch (error) {
         return Promise.reject(error);
       }
     }
 
-    return this.#getRequest(ENDPOINTS.RAW + ID);
+    return this._getRequest(ENDPOINTS.RAW + ID);
   }
 
   /**
@@ -121,7 +121,7 @@ export abstract class AbstractPastebin {
       return Promise.reject(new Error("Privacy level can only be 0 - 3"));
     }
 
-    const params = this.#createParams("paste");
+    const params = this._createParams("paste");
 
     params.api_paste_code = text;
     params.api_paste_private = privacy;
@@ -155,7 +155,7 @@ export abstract class AbstractPastebin {
       privacy === PrivacyLevel.PUBLIC_USER
     ) {
       try {
-        await this.#createAPIuserKey();
+        await this._createAPIuserKey();
       } catch (error) {
         return Promise.reject(error);
       }
@@ -176,7 +176,7 @@ export abstract class AbstractPastebin {
       ? PrivacyLevel.PUBLIC_ANONYMOUS
       : privacy;
 
-    return this.#postRequest(ENDPOINTS.POST, params);
+    return this._postRequest(ENDPOINTS.POST, params);
   }
 
   /**
@@ -195,17 +195,17 @@ export abstract class AbstractPastebin {
       ID = ID.replace("https://pastebin.com/", "");
     }
 
-    const params = this.#createParams("delete");
+    const params = this._createParams("delete");
     params.api_paste_key = ID;
 
     try {
-      await this.#createAPIuserKey();
+      await this._createAPIuserKey();
     } catch (error) {
       return Promise.reject(error);
     }
     params.api_user_key = this.config.api_user_key as string;
 
-    return this.#postRequest(ENDPOINTS.POST, params);
+    return this._postRequest(ENDPOINTS.POST, params);
   }
 
   /**
@@ -228,17 +228,17 @@ export abstract class AbstractPastebin {
       return Promise.reject(new Error("Dev key needed!"));
     }
 
-    const params = this.#createParams("list");
+    const params = this._createParams("list");
     params.api_results_limit = limit;
 
     try {
-      await this.#createAPIuserKey();
+      await this._createAPIuserKey();
     } catch (error) {
       return Promise.reject(error);
     }
     params.api_user_key = this.config.api_user_key as string;
 
-    return this.#postAndParse(params, this.#parsePastes);
+    return this._postAndParse(params, this._parsePastes);
   }
 
   /**
@@ -252,26 +252,26 @@ export abstract class AbstractPastebin {
       return Promise.reject(new Error("Dev key needed!"));
     }
 
-    const params = this.#createParams("userdetails");
+    const params = this._createParams("userdetails");
 
     try {
-      await this.#createAPIuserKey();
+      await this._createAPIuserKey();
     } catch (error) {
       return Promise.reject(error);
     }
     params.api_user_key = this.config.api_user_key as string;
 
-    return this.#postAndParse(params, this.#parseUser);
+    return this._postAndParse(params, this._parseUser);
   }
 
-  #postAndParse<T>(params: IPasteAPIOptions, parseFunc: (data: string) => T): Promise<T> {
-    return this.#postRequest(ENDPOINTS.POST, params)
+  private _postAndParse<T>(params: IPasteAPIOptions, parseFunc: (data: string) => T): Promise<T> {
+    return this._postRequest(ENDPOINTS.POST, params)
       .then((data) => {
         return parseFunc.call(this, data);
       });
   }
 
-  #createParams(option: string): IPasteAPIOptions {
+  private _createParams(option: string): IPasteAPIOptions {
     const opts: IPasteAPIOptions = {
       api_option: option,
     };
@@ -281,12 +281,12 @@ export abstract class AbstractPastebin {
     return opts;
   }
 
-  #validateConfig(...validateKeys: Array<keyof IPastebinOptions>): string | false {
+  private _validateConfig(...validateKeys: Array<keyof IPastebinOptions>): string | false {
     const missing = validateKeys.filter(
       (key) =>
-        isUndefined(this.#config[key]) ||
-        this.#config[key] === null ||
-        this.#config[key] === "",
+        isUndefined(this._config[key]) ||
+        this._config[key] === null ||
+        this._config[key] === "",
     );
 
     if (missing.length > 0) {
@@ -296,8 +296,8 @@ export abstract class AbstractPastebin {
     return false;
   }
 
-  #createAPIuserKey(): Promise<void> {
-    const inValid = this.#validateConfig(
+  private _createAPIuserKey(): Promise<void> {
+    const inValid = this._validateConfig(
       "api_dev_key",
       "api_user_name",
       "api_user_password",
@@ -319,7 +319,7 @@ export abstract class AbstractPastebin {
       api_user_password: string;
     };
 
-    return this.#postRequest(ENDPOINTS.LOGIN, {
+    return this._postRequest(ENDPOINTS.LOGIN, {
       api_dev_key,
       api_user_name,
       api_user_password,
@@ -337,7 +337,7 @@ export abstract class AbstractPastebin {
 
   // Parse
 
-  #parseUser(xml: string): User {
+  private _parseUser(xml: string): User {
     const data = parse(xml) as { user?: User };
     if (isUndefined(data) || isNull(data) || isUndefined(data.user)) {
       throw new Error("No data returned to _parseUser!");
@@ -345,7 +345,7 @@ export abstract class AbstractPastebin {
     return data.user;
   }
 
-  #parsePastes(xml: string): Paste[] {
+  private _parsePastes(xml: string): Paste[] {
     const { root: data } = parse(`<root>${xml}</root>`) as unknown as { root: { paste: Paste[] } };
     if (isUndefined(data) || isNull(data) || isUndefined(data.paste)) {
       throw new Error("No data returned to _parsePastes!");
@@ -355,7 +355,7 @@ export abstract class AbstractPastebin {
 
   // Request
 
-  #getRequestOptions(
+  private _getRequestOptions(
     method: "GET" | "POST",
     params: Record<string, string> | IPasteAPIOptions = {},
   ): RequestInit {
@@ -393,7 +393,7 @@ export abstract class AbstractPastebin {
     return init;
   }
 
-  async #handleResponse(
+  private async _handleResponse(
     res: Response,
     resolve: (value: string | PromiseLike<string>) => void,
     reject: (reason?: unknown) => void,
@@ -429,34 +429,37 @@ export abstract class AbstractPastebin {
     resolve(text);
   }
 
-  #abstractRequest(
+  private _abstractRequest(
     method: "GET" | "POST",
     path: string,
     params?: Record<string, string> | IPasteAPIOptions,
   ): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      const options = this.#getRequestOptions(method, params);
+      const options = this._getRequestOptions(method, params);
 
       this.fetch(path, options).then((res) => {
-        this.#handleResponse(res, resolve, reject);
+        this._handleResponse(res, resolve, reject);
       }).catch((err) => {
         reject(err);
       });
     });
   }
 
-  #getRequest(path: string): Promise<string> {
-    this.#debugger(">>>>> getRequest", path);
-    return this.#abstractRequest("GET", path);
+  private _getRequest(path: string): Promise<string> {
+    this._debugger(">>>>> getRequest", path);
+    return this._abstractRequest("GET", path);
   }
 
-  #postRequest(path: string, params: Record<string, string> | IPasteAPIOptions): Promise<string> {
-    this.#debugger(">>>>> postRequest", path, params);
-    return this.#abstractRequest("POST", path, params);
+  private _postRequest(
+    path: string,
+    params: Record<string, string> | IPasteAPIOptions,
+  ): Promise<string> {
+    this._debugger(">>>>> postRequest", path, params);
+    return this._abstractRequest("POST", path, params);
   }
 
-  #debugger(...args: unknown[]): void {
-    if (this.#debug) {
+  private _debugger(...args: unknown[]): void {
+    if (this._debug) {
       console.log(...args);
     }
   }
@@ -464,14 +467,14 @@ export abstract class AbstractPastebin {
   // Getters
 
   get debug(): boolean {
-    return this.#debug;
+    return this._debug;
   }
 
   get config(): IPastebinOptions {
-    return this.#config;
+    return this._config;
   }
 
   get hasDevKey(): boolean {
-    return this.#validateConfig("api_dev_key") === false;
+    return this._validateConfig("api_dev_key") === false;
   }
 }
