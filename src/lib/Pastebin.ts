@@ -359,18 +359,6 @@ export abstract class AbstractPastebin {
     method: "GET" | "POST",
     params: Record<string, string> | IPasteAPIOptions = {},
   ): RequestInit {
-    const abortController = this.requestTimeout > 0 && AbortController
-      ? new AbortController()
-      : undefined;
-
-    if (abortController) {
-      const _timeoutId = setTimeout(() => {
-        if (abortController) {
-          abortController.abort();
-        }
-      }, this.requestTimeout);
-    }
-
     const init: RequestInit = {
       headers: new Headers({
         "User-Agent": "Pastebin-ts",
@@ -378,7 +366,6 @@ export abstract class AbstractPastebin {
       }),
       method,
       cache: "no-cache",
-      signal: abortController ? abortController.signal : undefined,
     };
 
     if (method === "POST") {
@@ -395,54 +382,64 @@ export abstract class AbstractPastebin {
 
   async #handleResponse(
     res: Response,
-    resolve: (value: string | PromiseLike<string>) => void,
-    reject: (reason?: unknown) => void,
-  ): Promise<void> {
+  ): Promise<string> {
     if (res.status === 404) {
-      reject(new Error("Not found!"));
-      return;
+      return Promise.reject(new Error("Not found!"));
     }
     if (res.status === 403) {
-      reject(new Error("Forbidden! Is this paste private?"));
-      return;
+      return Promise.reject(new Error("Forbidden! Is this paste private?"));
     }
     if (!res.ok) {
-      reject(new Error(`Response not ok: ${res.status} : ${res.statusText}`));
-      return;
+      return Promise.reject(new Error(`Response not ok: ${res.status} : ${res.statusText}`));
     }
     let buffer: ArrayBuffer;
     try {
       buffer = await res.arrayBuffer();
     } catch (error) {
-      return reject(error);
+      return Promise.reject(error);
     }
     // parse Buffer as text
     const text = new TextDecoder().decode(buffer);
     if (text.includes("Bad API request")) {
-      reject(new Error("Bad API request"));
-      return;
+      return Promise.reject(new Error("Bad API request"));
     }
     if (text.includes("Post limit")) {
-      reject(new Error("Post limit reached"));
-      return;
+      return Promise.reject(new Error("Post limit reached"));
     }
-    resolve(text);
+    return text;
   }
 
-  #abstractRequest(
+  async #abstractRequest(
     method: "GET" | "POST",
     path: string,
     params?: Record<string, string> | IPasteAPIOptions,
   ): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      const options = this.#getRequestOptions(method, params);
+    const init = this.#getRequestOptions(method, params);
+    let timeout: number | null = null;
 
-      this.fetch(path, options).then((res) => {
-        this.#handleResponse(res, resolve, reject);
-      }).catch((err) => {
-        reject(err);
-      });
-    });
+    if (this.requestTimeout > 0 && AbortController) {
+      const abortController = new AbortController();
+      init.signal = abortController.signal;
+
+      timeout = setTimeout(() => {
+        this.#debugger(">>>>> aborting request");
+        if (abortController) {
+          abortController.abort();
+        }
+        timeout = null;
+      }, this.requestTimeout);
+    }
+
+    try {
+      const res = await this.fetch(path, init);
+      if (timeout !== null) {
+        clearTimeout(timeout);
+      }
+      return this.#handleResponse(res);
+    } catch (error) {
+      console.log("error", error);
+      return Promise.reject(error);
+    }
   }
 
   #getRequest(path: string): Promise<string> {

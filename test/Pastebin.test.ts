@@ -1,4 +1,11 @@
-import { assertEquals, assertRejects, MockFetch, resolvesNext, stub } from "../dev_deps.ts";
+import {
+  assertEquals,
+  assertRejects,
+  assertThrows,
+  MockFetch,
+  resolvesNext,
+  stub,
+} from "../dev_deps.ts";
 import { ExpirationTime, IPastebinOptions, Pastebin, PrivacyLevel } from "../mod.ts";
 
 // We're mocking Pastebin with a timeout of 0, so we don't introduce unwanted timeouts
@@ -19,6 +26,28 @@ Deno.test("Pastebin", async (t) => {
     mf.intercept("https://pastebin.com/api/api_login.php", {
       method: "POST",
     }).response("12345678901234567890123456789012");
+
+  // // Not working yet
+  // await t.step("getPaste - timeout", async () => {
+  //   class DelayPastebin extends Pastebin {
+  //     requestTimeout = 500;
+  //   }
+
+  //   mf.intercept("https://pastebin.com/raw.php?i=test2").response("Hello World!").delay(1000);
+
+  //   assertRejects(
+  //     () => {
+  //       const pastebin = new DelayPastebin(defaultOptions);
+  //       return pastebin.getPaste("https://pastebin.com/test2").then((res) => {
+  //         console.log(res);
+  //       }).catch((err) => {
+  //         console.log(err);
+  //       });
+  //     },
+  //     Error,
+  //     "Request timed out",
+  //   );
+  // });
 
   await t.step("getPaste - anonymous (with debug)", async () => {
     const pastebin = new TestPastebin({
