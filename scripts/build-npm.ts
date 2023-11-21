@@ -21,15 +21,16 @@ await build({
   mappings: {},
   declaration: "separate",
   skipSourceOutput: true,
-  scriptModule: false,
+  // scriptModule: false,
   shims: {
     deno: true,
   },
   test: false,
   typeCheck: false,
   compilerOptions: {
-    importHelpers: false,
+    importHelpers: true,
     target: "ES2021",
+    lib: ["ESNext"],
   },
   package: {
     // package.json properties
