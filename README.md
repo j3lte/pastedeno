@@ -63,8 +63,7 @@ const paste = await pastebin.createPaste({
     privacy: PrivacyLevel.PRIVATE,
     expiration: ExpirationTime.ONE_DAY
 });
-
-// paste will contain the paste url
+// paste = 'https://pastebin.com/XXXXXXXX'
 
 // Get the raw paste (either use the paste url or the paste id)
 const raw = await pastebin.getPaste('https://pastebin.com/XXXXXXXX');
@@ -75,8 +74,14 @@ const rawPrivate = await pastebin.getPaste('https://pastebin.com/XXXXXXXX', true
 // Delete the paste
 await pastebin.deletePaste('<paste id>');
 
-// get user info
-...
+// Get user info
+const userInfo = await pastebin.getUserInfo();
+
+// Get user pastes
+const userPastes = await pastebin.listUserPastes();
+
+// Set debug mode
+pastebin.setDebug(true);
 ```
 
 ## License
