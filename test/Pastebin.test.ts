@@ -1,11 +1,4 @@
-import {
-  assertEquals,
-  assertRejects,
-  assertThrows,
-  MockFetch,
-  resolvesNext,
-  stub,
-} from "../dev_deps.ts";
+import { assertEquals, assertRejects, MockFetch, resolvesNext, stub } from "../dev_deps.ts";
 import { ExpirationTime, IPastebinOptions, Pastebin, PrivacyLevel } from "../mod.ts";
 
 // We're mocking Pastebin with a timeout of 0, so we don't introduce unwanted timeouts
