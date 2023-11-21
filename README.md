@@ -2,15 +2,24 @@
 
 Pastebin Client for Deno/Node
 
-> Work in progress!
+> This is a fork of [pastebin-ts](https://github.com/j3lte/pastebin-ts), which is updated to work with both Deno and Node
 
-> This is a fork of pastebin-ts, which is updated to work with Deno and Node
+## Capabilities
+
+- Create a new paste (with optional title, format, privacy and expiration)
+- Get a paste (raw)
+- Delete a paste
+- Get user info
+- Get user pastes
+
+## API
+
+API Docs can be found on Deno Docs: [https://deno.land/x/pastedeno/mod.ts](https://deno.land/x/pastedeno/mod.ts)
 
 ## Usage
 
 ```ts
-// Import the module directly from Github for now
-import { Pastebin, PrivacyLevel, ExpirationTime } from "https://raw.githubusercontent.com/j3lte/pastedeno/main/mod.ts";
+import { Pastebin, PrivacyLevel, ExpirationTime } from "https://deno.land/x/pastedeno/mod.ts";
 
 // Create a new Pastebin instance
 const pastebin = new Pastebin({
@@ -30,7 +39,7 @@ const paste = await pastebin.createPaste({
 
 // paste will contain the paste url
 
-// Get the raw paste
+// Get the raw paste (either use the paste url or the paste id)
 const raw = await pastebin.getPaste('https://pastebin.com/XXXXXXXX');
 
 // Get the raw private paste
