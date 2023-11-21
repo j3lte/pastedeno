@@ -1,17 +1,4 @@
-export {
-  assertEquals,
-  assertMatch,
-  assertNotEquals,
-  assertThrows,
-} from "https://deno.land/std@0.207.0/testing/asserts.ts";
+export { assertEquals, assertRejects } from "https://deno.land/std@0.207.0/assert/mod.ts";
 export { emptyDir } from "https://deno.land/std@0.207.0/fs/mod.ts";
-import * as mf from "https://deno.land/x/mock_fetch@0.3.0/mod.ts";
-export { mf };
-export {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  it,
-} from "https://deno.land/std@0.207.0/testing/bdd.ts";
+export { MockFetch } from "https://deno.land/x/deno_mock_fetch@1.0.1/mod.ts";
+export { resolvesNext, stub } from "https://deno.land/std@0.207.0/testing/mock.ts";

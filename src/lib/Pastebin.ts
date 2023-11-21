@@ -23,13 +23,19 @@ const ENDPOINTS = {
 // @deno-fmt-ignore
 const formatTypeArr: FormatType[] = [
   "4cs",  "6502acme",  "6502kickass",  "6502tasm",  "abap",  "actionscript",  "actionscript3",  "ada",  "aimms",  "algol68",  "apache",  "applescript",  "apt_sources",  "arduino",  "arm",  "asm",  "asp",  "asymptote",  "autoconf",  "autohotkey",  "autoit",  "avisynth",  "awk",  "bascomavr",  "bash",  "basic4gl",  "dos",  "bibtex",  "b3d",  "blitzbasic",  "bmx",  "bnf",  "boo",  "bf",  "c",  "csharp",  "c_winapi",  "cpp",  "cpp-winapi",  "cpp-qt",  "c_loadrunner",  "caddcl",  "cadlisp",  "ceylon",  "cfdg",  "c_mac",  "chaiscript",  "chapel",  "cil",  "clojure",  "klonec",  "klonecpp",  "cmake",  "cobol",  "coffeescript",  "cfm",  "css",  "cuesheet",  "d",  "dart",  "dcl",  "dcpu16",  "dcs",  "delphi",  "oxygene",  "diff",  "div",  "dot",  "e",  "ezt",  "ecmascript",  "eiffel",  "email",  "epc",  "erlang",  "euphoria",  "fsharp",  "falcon",  "filemaker",  "fo",  "f1",  "fortran",  "freebasic",  "freeswitch",  "gambas",  "gml",  "gdb",  "gdscript",  "genero",  "genie",  "gettext",  "go",  "godot-glsl",  "groovy",  "gwbasic",  "haskell",  "haxe",  "hicest",  "hq9plus",  "html4strict",  "html5",  "icon",  "idl",  "ini",  "inno",  "intercal",  "io",  "ispfpanel",  "j",  "java",  "java5",  "javascript",  "jcl",  "jquery",  "json",  "julia",  "kixtart",  "kotlin",  "ksp",  "latex",  "ldif",  "lb",  "lsl2",  "lisp",  "llvm",  "locobasic",  "logtalk",  "lolcode",  "lotusformulas",  "lotusscript",  "lscript",  "lua",  "m68k",  "magiksf",  "make",  "mapbasic",  "markdown",  "matlab",  "mercury",  "metapost",  "mirc",  "mmix",  "mk-61",  "modula2",  "modula3",  "68000devpac",  "mpasm",  "mxml",  "mysql",  "nagios",  "netrexx",  "newlisp",  "nginx",  "nim",  "nsis",  "oberon2",  "objeck",  "objc",  "ocaml",  "ocaml-brief",  "octave",  "pf",  "glsl",  "oorexx",  "oobas",  "oracle8",  "oracle11",  "oz",  "parasail",  "parigp",  "pascal",  "pawn",  "pcre",  "per",  "perl",  "perl6",  "phix",  "php",  "php-brief",  "pic16",  "pike",  "pixelbender",  "pli",  "plsql",  "postgresql",  "postscript",  "povray",  "powerbuilder",  "powershell",  "proftpd",  "progress",  "prolog",  "properties",  "providex",  "puppet",  "purebasic",  "pycon",  "python",  "pys60",  "q",  "qbasic",  "qml",  "rsplus",  "racket",  "rails",  "rbs",  "rebol",  "reg",  "rexx",  "robots",  "roff",  "rpmspec",  "ruby",  "gnuplot",  "rust",  "sas",  "scala",  "scheme",  "scilab",  "scl",  "sdlbasic",  "smalltalk",  "smarty",  "spark",  "sparql",  "sqf",  "sql",  "sshconfig",  "standardml",  "stonescript",  "sclang",  "swift",  "systemverilog",  "tsql",  "tcl",  "teraterm",  "texgraph",  "thinbasic",  "typescript",  "typoscript",  "unicon",  "uscript",  "upc",  "urbi",  "vala",  "vbnet",  "vbscript",  "vedit",  "verilog",  "vhdl",  "vim",  "vb",  "visualfoxpro",  "visualprolog",  "whitespace",  "whois",  "winbatch",  "xbasic",  "xml",  "xojo",  "xorg_conf",  "xpp",  "yaml",  "yara",  "z80",  "zxbasic" ];
-const expirationTimeArr: string[] = Object.keys(ExpirationTime);
+const expirationTimeArr: string[] = Object.values(ExpirationTime);
 
 export abstract class AbstractPastebin {
   #config: IPastebinOptions;
 
   // We're able to overwrite fetch because it is an abstract class
   fetch = globalThis.fetch;
+
+  // RequestTimeout = 4000;
+  requestTimeout = 4000;
+
+  // DEBUG
+  #debug = false;
 
   constructor(config?: IPastebinOptions | string | null) {
     if (isUndefined(config) || isNull(config)) {
@@ -42,6 +48,9 @@ export abstract class AbstractPastebin {
       conf = { api_dev_key: conf };
     }
 
+    this.#debug = conf.debug === true;
+    delete conf.debug;
+
     this.#config = Object.assign({
       api_dev_key: null,
       api_user_key: null,
@@ -50,10 +59,16 @@ export abstract class AbstractPastebin {
     }, conf);
   }
 
+  setDebug(debug: boolean): void {
+    this.#debug = debug;
+  }
+
   /**
+   * Get the content of a paste
+   *
    * @param id ID of the paste
    * @param isPrivate is the paste private? Needs authentication
-   * @returns
+   * @returns { Promise<string> } returns the content of the paste
    */
   async getPaste(
     id: string,
@@ -62,6 +77,9 @@ export abstract class AbstractPastebin {
     let ID = id;
     if (ID.startsWith("https://pastebin.com/")) {
       ID = ID.replace("https://pastebin.com/", "");
+    }
+    if (!ID || ID.length === 0) {
+      return Promise.reject(new Error("Invalid paste url or id"));
     }
     if (isPrivate) {
       const params = this.#createParams("show_paste");
@@ -79,6 +97,12 @@ export abstract class AbstractPastebin {
     return this.#getRequest(ENDPOINTS.RAW + ID);
   }
 
+  /**
+   * Create a paste
+   *
+   * @param options { ICreatePasteTextOptions } options for creating a paste
+   * @returns { Promise<string> } returns the url of the created paste
+   */
   async createPaste(options: ICreatePasteTextOptions): Promise<string> {
     if (!this.hasDevKey) {
       return Promise.reject(new Error("Dev key needed!"));
@@ -118,7 +142,7 @@ export abstract class AbstractPastebin {
 
     if (typeof format === "string") {
       if (formatTypeArr.includes(format as FormatType)) {
-        params.api_paste_format = format;
+        params.api_paste_format = format as FormatType;
       } else {
         return Promise.reject(
           new Error(`Paste format ${options.format} is unknown!`),
@@ -140,7 +164,7 @@ export abstract class AbstractPastebin {
 
     if (typeof expiration === "string") {
       if (expirationTimeArr.includes(expiration)) {
-        params.api_paste_expire_date = expiration;
+        params.api_paste_expire_date = expiration as ExpirationTime;
       } else {
         return Promise.reject(
           new Error(`Expiration format '${expiration}' is unknown!`),
@@ -155,6 +179,12 @@ export abstract class AbstractPastebin {
     return this.#postRequest(ENDPOINTS.POST, params);
   }
 
+  /**
+   * Delete a paste
+   *
+   * @param pasteID { string } ID of the paste
+   * @returns { Promise<string> } returns the response of the request
+   */
   async deletePaste(pasteID: string): Promise<string> {
     if (!this.hasDevKey) {
       return Promise.reject(new Error("Dev key needed!"));
@@ -178,6 +208,14 @@ export abstract class AbstractPastebin {
     return this.#postRequest(ENDPOINTS.POST, params);
   }
 
+  /**
+   * List all pastes of a user
+   *
+   * @param limit { number } limit of pastes to return (default: 50, max: 1000)
+   * @returns { Promise<Paste[]> } returns an array of pastes
+   * @throws { Error } throws an error if the limit is not between 1 and 1000
+   * @throws { Error } throws an error if the dev key is missing
+   */
   async listUserPastes(limit = 50): Promise<Paste[]> {
     if (limit < 1 || limit > 1000) {
       return Promise.reject(
@@ -203,6 +241,12 @@ export abstract class AbstractPastebin {
     return this.#postAndParse(params, this.#parsePastes);
   }
 
+  /**
+   * Get user information
+   *
+   * @returns { Promise<User> } returns the user information
+   * @throws { Error } throws an error if the dev key is missing
+   */
   async getUserInfo(): Promise<User> {
     if (!this.hasDevKey) {
       return Promise.reject(new Error("Dev key needed!"));
@@ -315,14 +359,17 @@ export abstract class AbstractPastebin {
     method: "GET" | "POST",
     params: Record<string, string> | IPasteAPIOptions = {},
   ): RequestInit {
-    const abortController = AbortController ? new AbortController() : undefined;
-    const timeout = 4000;
+    const abortController = this.requestTimeout > 0 && AbortController
+      ? new AbortController()
+      : undefined;
 
-    const _timeoutId = setTimeout(() => {
-      if (abortController) {
-        abortController.abort();
-      }
-    }, timeout);
+    if (abortController) {
+      const _timeoutId = setTimeout(() => {
+        if (abortController) {
+          abortController.abort();
+        }
+      }, this.requestTimeout);
+    }
 
     const init: RequestInit = {
       headers: new Headers({
@@ -351,10 +398,6 @@ export abstract class AbstractPastebin {
     resolve: (value: string | PromiseLike<string>) => void,
     reject: (reason?: unknown) => void,
   ): Promise<void> {
-    if (!res || res === null) {
-      reject(new Error("No response!"));
-      return;
-    }
     if (res.status === 404) {
       reject(new Error("Not found!"));
       return;
@@ -394,11 +437,6 @@ export abstract class AbstractPastebin {
     return new Promise<string>((resolve, reject) => {
       const options = this.#getRequestOptions(method, params);
 
-      if (!path) {
-        reject(new Error("No path provided!"));
-        return;
-      }
-
       this.fetch(path, options).then((res) => {
         this.#handleResponse(res, resolve, reject);
       }).catch((err) => {
@@ -408,11 +446,25 @@ export abstract class AbstractPastebin {
   }
 
   #getRequest(path: string): Promise<string> {
+    this.#debugger(">>>>> getRequest", path);
     return this.#abstractRequest("GET", path);
   }
 
   #postRequest(path: string, params: Record<string, string> | IPasteAPIOptions): Promise<string> {
+    this.#debugger(">>>>> postRequest", path, params);
     return this.#abstractRequest("POST", path, params);
+  }
+
+  #debugger(...args: unknown[]): void {
+    if (this.#debug) {
+      console.log(...args);
+    }
+  }
+
+  // Getters
+
+  get debug(): boolean {
+    return this.#debug;
   }
 
   get config(): IPastebinOptions {

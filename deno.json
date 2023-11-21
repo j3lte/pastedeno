@@ -3,7 +3,7 @@
     "format": "deno fmt ./src/",
     "lint": "deno lint ./src/",
     "test": "deno test --coverage=.coverage",
-    "coverage": "deno coverage .coverage --lcov --excluse=/src/node/ --exclude=/test/ --exclude=/scripts/ > ./.coverage/coverage.lcov",
+    "coverage": "deno coverage .coverage --lcov --exclude=/src/node/ --exclude=/test/ --exclude=/scripts/ > ./.coverage/coverage.lcov",
     "test:watch": "deno test --watch",
     "localTest": "deno run --allow-read --allow-write --allow-run ./scripts/watch-test.ts",
     "clean": "rm -r ./coverage",
@@ -32,6 +32,7 @@
       ]
     },
     "exclude": [
+      "./_local_testing.ts",
       "npm/"
     ]
   },

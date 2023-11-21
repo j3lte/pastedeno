@@ -23,11 +23,11 @@ jobs:
       - name: Check linting
         run: deno lint
 
-    #   - name: Tests
-    #     run: deno task test
+      - name: Tests
+        run: deno task test
 
-    #   - name: Coverage
-    #     run: deno task coverage
+      - name: Coverage
+        run: deno task coverage
 
     # Disabled for now
     #   - name: Upload coverage reports to Codecov

@@ -3,6 +3,7 @@ export interface IPastebinOptions {
   api_user_key?: null | string;
   api_user_name?: null | string;
   api_user_password?: null | string;
+  debug?: boolean;
 }
 
 export enum PrivacyLevel {
@@ -297,9 +298,9 @@ export interface ICreatePasteBaseOptions<T> {
   text?: string;
   file?: string | T;
   title?: string;
-  format?: FormatType;
-  privacy?: PrivacyLevel;
-  expiration?: ExpirationTime | null;
+  format?: FormatType | string;
+  privacy?: PrivacyLevel | number;
+  expiration?: ExpirationTime | string | null;
 }
 
 export interface ICreatePasteTextOptions extends ICreatePasteBaseOptions<never> {

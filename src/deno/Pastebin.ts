@@ -2,6 +2,12 @@ import { AbstractPastebin } from "../lib/Pastebin.ts";
 import { ICreatePasteFileOptions, ICreatePasteTextOptions } from "../lib/interfaces.ts";
 
 export class Pastebin extends AbstractPastebin {
+  /**
+   * Create a paste from a file
+   *
+   * @param options { ICreatePasteFileOptions } options for creating a paste
+   * @returns { Promise<string> } returns the url of the created paste
+   */
   async createPasteFromFile(
     options: ICreatePasteFileOptions<Uint8Array> = { file: "" },
   ): Promise<unknown> {
