@@ -3,8 +3,11 @@ import { ICreatePasteFileOptions, ICreatePasteTextOptions } from "../lib/interfa
 
 import fs from "node:fs/promises";
 import { Buffer } from "node:buffer";
+import fetch from "npm:node-fetch@3.3.2";
 
 export class Pastebin extends AbstractPastebin {
+  fetch = fetch as unknown as typeof globalThis.fetch;
+
   async createPasteFromFile(
     options: ICreatePasteFileOptions<Buffer> = { file: "" },
   ): Promise<unknown> {

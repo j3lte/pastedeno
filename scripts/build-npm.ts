@@ -1,4 +1,4 @@
-import { build, emptyDir } from "https://deno.land/x/dnt@0.39.0/mod.ts";
+import { build, emptyDir } from "../dev_deps.ts";
 
 const cleanupTypes = async (dir: string) => {
   for await (const dirEntry of Deno.readDir(dir)) {
