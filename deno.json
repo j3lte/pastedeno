@@ -5,8 +5,10 @@
     "lint": "deno lint ./src/",
     "test": "deno test --coverage=.coverage",
     "coverage": "deno coverage .coverage --lcov --exclude=/src/node/ --exclude=/test/ --exclude=/scripts/ > ./.coverage/coverage.lcov",
+
     "test:watch": "deno test --watch",
     "update:version": "deno run --allow-read --allow-write ./scripts/update-version.ts",
+    "update:deno_deps": "deno run -A https://deno.land/x/udd/main.ts dev_deps.ts ./src/lib/Pastebin.ts ./src/lib/Scraper.ts",
     "localTest": "deno run --allow-read --allow-write --allow-run ./scripts/watch-test.ts",
     "clean": "rm -r ./coverage",
     "npm": "deno run -A ./scripts/build-npm.ts"
