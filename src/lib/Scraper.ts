@@ -118,7 +118,7 @@ export class Scraper {
   lastKeys: string[] = [];
 
   // Version
-  static version = "0.4.1";
+  static version = "0.4.2";
 
   /**
    * @param opts {ScrapeOptions} The options for the scraper.

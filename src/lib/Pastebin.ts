@@ -40,7 +40,7 @@ export abstract class AbstractPastebin {
   #debug = false;
 
   // VERSION
-  static version = "0.4.1";
+  static version = "0.4.2";
 
   constructor(config?: IPastebinOptions | string | null) {
     if (isUndefined(config) || isNull(config)) {
