@@ -13,6 +13,16 @@ type EventTypes =
   | ["scrape", (data: unknown[]) => void]
   | ["new", (data: unknown) => void];
 
+export interface ScrapeOptions {
+  intervalTime?: number;
+  autoStart?: boolean;
+}
+
+const defaultOptions: ScrapeOptions = {
+  intervalTime: 10000,
+  autoStart: false,
+};
+
 export class Scraper {
   // We're able to overwrite fetch because it is an abstract class
   fetch = globalThis.fetch;
@@ -21,39 +31,48 @@ export class Scraper {
   #intervalLength: number;
   #interval: number | null = null;
 
-  constructor(
-    intervalTime = 10000,
-  ) {
-    if (intervalTime < 1000) {
-      throw new Error("Interval time should be at least 1000");
+  #timeout: number | null = null;
+
+  constructor(opts?: ScrapeOptions) {
+    const options = {
+      ...defaultOptions,
+      ...opts,
+    };
+
+    if (
+      typeof options.intervalTime === "undefined" || !Number.isInteger(options.intervalTime) ||
+      options.intervalTime < 1000
+    ) {
+      throw new Error("Interval time must be an integer and at least 1000!");
     }
-    this.#intervalLength = intervalTime;
+    this.#intervalLength = options.intervalTime;
+
+    if (options.autoStart) {
+      this.start();
+    }
   }
 
   start(): void {
-    this.#fire("start");
-
-    if (this.#interval !== null) {
-      this.stop();
+    if (this.#timeout === null) {
     }
-
-    this.#interval = setInterval(async () => {
-      try {
-        const data = await this.#scrape();
-        this.#fire("scrape", data);
-      } catch (error) {
-        this.#fire("error", error);
-      }
-    }, this.#intervalLength);
   }
 
   stop(): void {
-    this.#fire("stop");
-    if (this.#interval !== null) {
-      clearInterval(this.#interval);
-      this.#interval = null;
+    if (this.#timeout !== null) {
+      this.#fire("stop");
+      clearTimeout(this.#timeout);
+      this.#timeout = null;
     }
   }
+
+  #scrapeAndFire = async (): Promise<void> => {
+    try {
+      const data = await this.#scrape();
+      this.#fire("scrape", data);
+    } catch (error) {
+      this.#fire("error", error);
+    }
+  };
 
   on(eventName: "start", handler: () => void): void;
   on(eventName: "stop", handler: () => void): void;
