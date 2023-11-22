@@ -1,11 +1,4 @@
-import {
-  assertEquals,
-  assertRejects,
-  assertThrows,
-  MockFetch,
-  resolvesNext,
-  stub,
-} from "../dev_deps.ts";
+import { assertEquals, assertRejects, assertThrows, MockFetch } from "../dev_deps.ts";
 import { Scraper } from "../mod.ts";
 
 async function runTest(
@@ -114,6 +107,7 @@ Deno.test({
       });
 
       assertEquals(started, true);
+      assertEquals(stopped, true);
 
       mf.deactivate();
     });
