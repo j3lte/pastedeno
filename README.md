@@ -17,7 +17,7 @@ Pastebin Client for Deno/Node
     <img src="https://raw.githubusercontent.com/j3lte/pastedeno/main/assets/logo.png">
 </p>
 
-> This is a fork of [pastebin-ts](https://github.com/j3lte/pastebin-ts), which is updated to work with both Deno and Node
+> This is a continuation of [pastebin-ts](https://github.com/j3lte/pastebin-ts) and its predecessor [pastebin-js](https://github.com/j3lte/pastebin-js). The main difference between Pastedeno and its predecessors is that it is completely rewritten and uses less dependencies (and up-to-date ones). Alongside the Deno version a Node version is automatically published to NPM.
 
 ## Capabilities
 
