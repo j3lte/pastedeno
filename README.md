@@ -1,4 +1,4 @@
-# Pastedeno
+# PasteDeno
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/j3lte/pastedeno?style=for-the-badge)](https://github.com/j3lte/pastedeno/releases/latest "GitHub release (latest by date)")
 [![NPM Version](https://img.shields.io/npm/v/pastedeno?style=for-the-badge)](https://www.npmjs.com/package/pastedeno "NPM Version")
