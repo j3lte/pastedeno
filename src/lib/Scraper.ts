@@ -117,6 +117,9 @@ export class Scraper {
 
   lastKeys: string[] = [];
 
+  // Version
+  static version = "0.4.1";
+
   /**
    * @param opts {ScrapeOptions} The options for the scraper.
    * @throws {Error} If the interval time is not an integer or is less than 1000.

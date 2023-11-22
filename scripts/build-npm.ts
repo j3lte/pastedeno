@@ -1,3 +1,5 @@
+// Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
+
 import { build, emptyDir } from "https://deno.land/x/dnt@0.39.0/mod.ts";
 
 const cleanupTypes = async (dir: string) => {

@@ -1,0 +1,35 @@
+name: Update version (On Demand)
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (x.y.z):"
+        required: true
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Update version (On Demand)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.38.2
+
+      - name: Run Update Version
+        run: deno task update:version ${{ github.event.inputs.version }}
+
+      - name: Commit changes
+        id: auto-commit-action
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update Version (On Demand)
+          commit_options: '--no-verify'
+          tagging_message: ${{ github.event.inputs.version }}

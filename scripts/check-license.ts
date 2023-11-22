@@ -22,7 +22,6 @@ for await (
       ...EXCLUDED_DIRS.map((path) => globToRegExp(path)),
       /node_modules/,
       /npm/,
-      /script/,
       /_local_testing\.ts/,
     ],
     includeDirs: false,

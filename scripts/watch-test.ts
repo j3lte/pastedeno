@@ -1,3 +1,5 @@
+// Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
+
 import { emptyDir } from "../dev_deps.ts";
 
 const watcher = Deno.watchFs([
