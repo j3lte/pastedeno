@@ -14,7 +14,7 @@
 Pastebin Client for Deno/Node
 
 <p align="center">
-    <img src="/assets/logo.png">
+    <img src="https://raw.githubusercontent.com/j3lte/pastedeno/main/assets/logo.png">
 </p>
 
 > This is a fork of [pastebin-ts](https://github.com/j3lte/pastebin-ts), which is updated to work with both Deno and Node
