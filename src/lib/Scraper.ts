@@ -1,3 +1,5 @@
+// Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
+
 import { Evt as Event, to as toEvent } from "https://deno.land/x/evt@v2.5.3/mod.ts";
 
 const ENDPOINTS = {

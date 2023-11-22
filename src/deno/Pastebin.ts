@@ -1,3 +1,5 @@
+// Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
+
 import { AbstractPastebin } from "../lib/Pastebin.ts";
 import { ICreatePasteFileOptions, ICreatePasteTextOptions } from "../lib/interfaces.ts";
 

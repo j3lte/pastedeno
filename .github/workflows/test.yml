@@ -23,6 +23,9 @@ jobs:
       - name: Check linting
         run: deno lint
 
+      - name: Check license
+        run: deno run check:license
+
       - name: Tests
         run: deno task test
 

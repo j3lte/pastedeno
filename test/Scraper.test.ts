@@ -1,3 +1,5 @@
+// Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
+
 import { assertEquals, assertRejects, assertThrows, MockFetch } from "../dev_deps.ts";
 import { Scraper } from "../mod.ts";
 

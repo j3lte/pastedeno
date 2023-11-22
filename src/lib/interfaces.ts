@@ -1,3 +1,5 @@
+// Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
+
 export interface IPastebinOptions {
   api_dev_key?: null | string;
   api_user_key?: null | string;

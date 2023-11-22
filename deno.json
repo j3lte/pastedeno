@@ -1,5 +1,6 @@
 {
   "tasks": {
+    "check:license": "deno run -A ./scripts/check-license.ts --check",
     "format": "deno fmt ./src/",
     "lint": "deno lint ./src/",
     "test": "deno test --coverage=.coverage",
