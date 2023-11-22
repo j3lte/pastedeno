@@ -18,7 +18,12 @@ await emptyDir("./npm");
 await build({
   entryPoints: ["./src/node/index.ts"],
   outDir: "./npm",
-  mappings: {},
+  mappings: {
+    "https://deno.land/x/evt@v2.5.3/mod.ts": {
+      name: "evt",
+      version: "2.5.3",
+    },
+  },
   declaration: "separate",
   skipSourceOutput: true,
   // scriptModule: false,

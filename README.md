@@ -1,4 +1,4 @@
-# Pastedeno
+# PasteDeno
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/j3lte/pastedeno?style=for-the-badge)](https://github.com/j3lte/pastedeno/releases/latest "GitHub release (latest by date)")
 [![NPM Version](https://img.shields.io/npm/v/pastedeno?style=for-the-badge)](https://www.npmjs.com/package/pastedeno "NPM Version")
@@ -13,15 +13,25 @@
 
 Pastebin Client for Deno/Node
 
+<p align="center">
+    <img src="/assets/logo.png">
+</p>
+
 > This is a fork of [pastebin-ts](https://github.com/j3lte/pastebin-ts), which is updated to work with both Deno and Node
 
 ## Capabilities
 
+### Pastebin API
 - Create a new paste (with optional title, format, privacy and expiration)
 - Get a paste (raw)
 - Delete a paste
 - Get user info
 - Get user pastes
+
+### Scraper [(PRO only)](https://pastebin.com/doc_scraping_api)
+- Scrape latest pastes
+- Get raw paste
+- Get paste metadata
 
 ## API
 
@@ -44,6 +54,8 @@ import { Pastebin } from "pastedeno";
 ```
 
 ## Usage
+
+### Pastebin API
 
 ```ts
 import { Pastebin, PrivacyLevel, ExpirationTime } from "https://deno.land/x/pastedeno/mod.ts";
@@ -82,6 +94,31 @@ const userPastes = await pastebin.listUserPastes();
 
 // Set debug mode
 pastebin.setDebug(true);
+```
+
+### Scraper [(PRO only)](https://pastebin.com/doc_scraping_api)
+
+```ts
+import { Scraper } from "https://deno.land/x/pastedeno/mod.ts";
+
+const scraper = new Scraper({
+  intervalTime: 5000,
+  limit: 10,
+});
+
+scraper.on("scrape", (data) => {
+  console.table(data);
+});
+
+scraper.on("new", (data) => {
+  console.log(`New paste: ${data.key}`);
+});
+
+scraper.on("error", (error) => {
+  console.error(error);
+});
+
+scraper.start();
 ```
 
 ## License
