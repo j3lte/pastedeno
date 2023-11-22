@@ -1,9 +1,8 @@
 // Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
 
-import { globToRegExp, walk } from "../dev_deps.ts";
+import { walk } from "../dev_deps.ts";
 
 const EXTENSIONS = [".ts"];
-const EXCLUDED_DIRS = ["cov"];
 
 const ROOT = new URL("../", import.meta.url);
 const CHECK = Deno.args.includes("--check");
@@ -19,7 +18,7 @@ for await (
   const { path } of walk(ROOT, {
     exts: EXTENSIONS,
     skip: [
-      ...EXCLUDED_DIRS.map((path) => globToRegExp(path)),
+      /\.coverage/,
       /node_modules/,
       /npm/,
       /_local_testing\.ts/,
@@ -27,6 +26,7 @@ for await (
     includeDirs: false,
   })
 ) {
+  console.log("Checking " + path);
   const content = await Deno.readTextFile(path);
   const match = content.match(RX_COPYRIGHT);
 

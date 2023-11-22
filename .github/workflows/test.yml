@@ -24,7 +24,7 @@ jobs:
         run: deno lint
 
       - name: Check license
-        run: deno run check:license
+        run: deno task check:license
 
       - name: Tests
         run: deno task test
