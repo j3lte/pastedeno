@@ -32,4 +32,4 @@ jobs:
         with:
           commit_message: Update Version (On Demand)
           commit_options: '--no-verify'
-          tagging_message: ${{ github.event.inputs.version }}
+        #   tagging_message: ${{ github.event.inputs.version }}
