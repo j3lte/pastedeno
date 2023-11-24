@@ -29,7 +29,8 @@ export abstract class AbstractPastebin {
   #config: IPastebinOptions;
 
   // We're able to overwrite fetch because it is an abstract class
-  fetch = globalThis.fetch;
+  #fetch = globalThis.fetch;
+  #parseXML: (_xml: string) => Record<string, string>;
 
   // RequestTimeout = 4000;
   requestTimeout = 4000;
@@ -40,7 +41,20 @@ export abstract class AbstractPastebin {
   // VERSION
   static version = "0.6.0";
 
-  constructor(config?: IPastebinOptions | string | null) {
+  constructor(config?: IPastebinOptions | string | null, options?: {
+    fetch?: typeof globalThis.fetch;
+    parseXML?: (_xml: string) => Record<string, string>;
+  }) {
+    if (options?.fetch) {
+      this.#fetch = options.fetch;
+    }
+    if (options?.parseXML) {
+      this.#parseXML = options.parseXML;
+    } else {
+      this.#parseXML = (xml: string): Record<string, string> => {
+        throw new Error("Not implemented!");
+      };
+    }
     if (isUndefined(config) || isNull(config)) {
       this.#config = {};
       return;
@@ -339,12 +353,9 @@ export abstract class AbstractPastebin {
   }
 
   // Parse
-  parseXML(_xml: string): Record<string, string> {
-    throw new Error("Not implemented!");
-  }
 
   #parseUser(xml: string): User {
-    const data = this.parseXML(xml) as { user?: User };
+    const data = this.#parseXML(xml) as { user?: User };
     if (isUndefined(data) || isNull(data) || isUndefined(data.user)) {
       throw new Error("No data returned to _parseUser!");
     }
@@ -352,7 +363,7 @@ export abstract class AbstractPastebin {
   }
 
   #parsePastes(xml: string): Paste[] {
-    const { root: data } = this.parseXML(`<root>${xml}</root>`) as unknown as {
+    const { root: data } = this.#parseXML(`<root>${xml}</root>`) as unknown as {
       root: { paste: Paste[] };
     };
     if (isUndefined(data) || isNull(data) || isUndefined(data.paste)) {
@@ -439,7 +450,7 @@ export abstract class AbstractPastebin {
     }
 
     try {
-      const res = await this.fetch(path, init);
+      const res = await this.#fetch(path, init);
       if (timeout !== null) {
         clearTimeout(timeout);
       }

@@ -11,9 +11,12 @@ import {
 
 export class Pastebin extends AbstractPastebin {
   constructor(config?: IPastebinOptions | string | null) {
-    super(config);
-    // This is probably not the best way to do this, but it works
-    super.parseXML = this.parseXml;
+    super(config, {
+      parseXML: (xml: string): Record<string, string> => {
+        const data = parse(xml) as unknown as Record<string, string>;
+        return data;
+      },
+    });
   }
 
   /**
@@ -52,9 +55,4 @@ export class Pastebin extends AbstractPastebin {
 
     return this.createPaste(pasteOpts);
   }
-
-  parseXml = (xml: string): Record<string, string> => {
-    const data = parse(xml) as unknown as Record<string, string>;
-    return data;
-  };
 }

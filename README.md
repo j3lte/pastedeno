@@ -42,6 +42,7 @@ For the Deno version the following packages are used:
 For the Node version the following packages are used:
 - [fast-xml-parser](https://www.npmjs.com/package/fast-xml-parser) (for parsing XML) ([MIT License](https://github.com/NaturalIntelligence/fast-xml-parser/blob/master/LICENSE))
 - [evt](https://www.npmjs.com/package/evt) (for event handling in Scraper) ([MIT License](https://github.com/garronej/evt/blob/main/LICENSE))
+- [node-fetch](https://www.npmjs.com/package/node-fetch) (for fetching data) ([MIT License](https://github.com/node-fetch/node-fetch/blob/main/LICENSE.md))
 
 ## API
 

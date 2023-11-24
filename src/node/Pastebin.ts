@@ -12,14 +12,18 @@ import { Buffer } from "node:buffer";
 import fetch from "npm:node-fetch@3.3.2";
 import { XMLParser } from "npm:fast-xml-parser@4.3.2";
 
+const parser = new XMLParser();
+
 export class Pastebin extends AbstractPastebin {
   constructor(config?: IPastebinOptions | string | null) {
-    super(config);
-    // This is probably not the best way to do this, but it works
-    super.parseXML = this.parseXml;
+    super(config, {
+      fetch: fetch as unknown as typeof globalThis.fetch,
+      parseXML: (xml: string): Record<string, string> => {
+        const data = parser.parse(xml);
+        return data;
+      },
+    });
   }
-
-  fetch = fetch as unknown as typeof globalThis.fetch;
 
   async createPasteFromFile(
     options: ICreatePasteFileOptions<Buffer> = { file: "" },
@@ -50,10 +54,4 @@ export class Pastebin extends AbstractPastebin {
 
     return this.createPaste(pasteOpts);
   }
-
-  parseXml = (xml: string): Record<string, string> => {
-    const parser = new XMLParser();
-    const data = parser.parse(xml);
-    return data;
-  };
 }

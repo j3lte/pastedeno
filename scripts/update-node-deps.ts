@@ -49,23 +49,40 @@ async function update_npm_package(packageName: string, fileContent: string): Pro
 
 async function update_npm_packages(): Promise<void> {
   const pastebinPath = `${getDirPath()}/../src/node/Pastebin.ts`;
-
   const pastebinFile = await Deno.readTextFile(pastebinPath);
 
   try {
     // update node-fetch and fast-xml-parser
-    const updatedFile = await update_npm_package("node-fetch", pastebinFile);
-    const updatedFile2 = await update_npm_package("fast-xml-parser", updatedFile);
+    const updatedPastebinFile = await update_npm_package("node-fetch", pastebinFile).then((f) =>
+      update_npm_package("fast-xml-parser", f)
+    );
 
-    if (pastebinFile === updatedFile2) {
-      console.log("No changes to npm packages needed.");
-      return;
+    if (pastebinFile === updatedPastebinFile) {
+      console.log("No changes to npm packages needed in Pastebin.ts");
+    } else {
+      console.log("Updating npm packages in Scraper.ts");
+      await Deno.writeTextFile(pastebinPath, updatedPastebinFile);
     }
-
-    console.log("Updating npm packages in Pastebin.ts");
-    await Deno.writeTextFile(pastebinPath, updatedFile2);
   } catch (error) {
     console.error("Error updating version in Pastebin.ts");
+    console.error(error);
+  }
+
+  const scraperPath = `${getDirPath()}/../src/node/Scraper.ts`;
+  const scraperFile = await Deno.readTextFile(scraperPath);
+
+  try {
+    // update node-fetch
+    const updatedScraperFile = await update_npm_package("node-fetch", scraperFile);
+
+    if (scraperFile === updatedScraperFile) {
+      console.log("No changes to npm packages needed in Scraper.ts");
+    } else {
+      console.log("Updating npm packages in Scraper.ts");
+      await Deno.writeTextFile(scraperPath, updatedScraperFile);
+    }
+  } catch (error) {
+    console.error("Error updating version in Scraper.ts");
     console.error(error);
   }
 }

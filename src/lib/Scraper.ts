@@ -132,11 +132,15 @@ export class Scraper {
    * });
    * ```
    */
-  constructor(opts?: ScrapeOptions) {
+  constructor(opts?: ScrapeOptions, fetch?: typeof globalThis.fetch) {
     const options = {
       ...defaultOptions,
       ...opts,
     };
+
+    if (fetch) {
+      this.fetch = fetch;
+    }
 
     if (
       typeof options.intervalTime === "undefined" || !Number.isInteger(options.intervalTime) ||
