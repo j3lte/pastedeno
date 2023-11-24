@@ -38,7 +38,7 @@ export abstract class AbstractPastebin {
   #debug = false;
 
   // VERSION
-  static version = "0.5.0";
+  static version = "0.6.0";
 
   constructor(config?: IPastebinOptions | string | null) {
     if (isUndefined(config) || isNull(config)) {
