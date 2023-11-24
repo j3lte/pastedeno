@@ -37,6 +37,14 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 Deno.test({
   name: "Scraper",
   fn: async (context) => {
+    await runTest(context, "constructor", () => {
+      // overwrite fetch
+      const fetch = () => {};
+
+      const scraper = new Scraper({}, fetch as unknown as typeof globalThis.fetch);
+      assertEquals(scraper.fetch, fetch as unknown as typeof globalThis.fetch);
+    });
+
     await runTest(context, "errors", () => {
       assertThrows(() => new Scraper({ intervalTime: 0, limit: 0 }));
       assertThrows(() => new Scraper({ intervalTime: 1000, limit: 0 }));
@@ -48,6 +56,14 @@ Deno.test({
       mf.intercept("https://scrape.pastebin.com/api_scraping.php?limit=1").response(json(1)).times(
         2,
       );
+      mf.intercept("https://scrape.pastebin.com/api_scraping.php?limit=1").response(
+        JSON.stringify([
+          {
+            ...simpleScrape,
+            expire: "1111111111",
+          },
+        ]),
+      );
 
       const scraper = new Scraper({});
 
@@ -56,6 +72,7 @@ Deno.test({
       assertEquals(d.key, "abc");
       assertEquals(d.title, "abc");
       assertEquals(d.user, "abc");
+      assertEquals(d.expire, null);
       assertEquals(d.size, 123);
       assertEquals(d.hits, 123);
       assertEquals(d.syntax, "abc");
@@ -69,6 +86,11 @@ Deno.test({
       assertEquals(single[0].size, 123);
       assertEquals(single[0].hits, 123);
       assertEquals(single[0].syntax, "abc");
+
+      const second = await scraper.singleScrape(1);
+
+      assertEquals(second.length, 1);
+      assertEquals(typeof second[0].expire, "object");
 
       mf.deactivate();
     });
@@ -110,6 +132,33 @@ Deno.test({
 
       assertEquals(started, true);
       assertEquals(stopped, true);
+
+      mf.deactivate();
+    });
+
+    await runTest(context, "scrape error test", async () => {
+      const mf = new MockFetch();
+      mf.intercept("https://scrape.pastebin.com/api_scraping.php?limit=1").response(
+        "test",
+        { status: 403 },
+      );
+
+      const started = await new Promise((resolve) => {
+        const scraper = new Scraper({
+          limit: 1,
+          breakOnError: true,
+        });
+
+        scraper.on("error", async () => {
+          await wait(1000).then(() => {
+            resolve(true);
+          });
+        });
+
+        scraper.start();
+      });
+
+      assertEquals(started, true);
 
       mf.deactivate();
     });

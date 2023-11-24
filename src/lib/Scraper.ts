@@ -105,7 +105,7 @@ const convertData = (paste: ScrapePasteRaw): ScrapePaste => {
 
 export class Scraper {
   // We're able to overwrite fetch because it is an abstract class
-  fetch = globalThis.fetch;
+  #fetch = globalThis.fetch;
 
   #events = new Event<EventTypes>();
 
@@ -139,7 +139,7 @@ export class Scraper {
     };
 
     if (fetch) {
-      this.fetch = fetch;
+      this.#fetch = fetch;
     }
 
     if (
@@ -226,7 +226,7 @@ export class Scraper {
     const realKey = key
       .replace("https://scrape.pastebin.com/api_scrape_item.php?i=", "")
       .replace("https://pastebin.com/", "");
-    return this.fetch(`${ENDPOINTS.RAW}${realKey}`)
+    return this.#fetch(`${ENDPOINTS.RAW}${realKey}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Error fetching raw: ${response.statusText}`);
@@ -245,7 +245,7 @@ export class Scraper {
     const realKey = key
       .replace("https://scrape.pastebin.com/api_scrape_item.php?i=", "")
       .replace("https://pastebin.com/", "");
-    return this.fetch(`${ENDPOINTS.META}${realKey}`)
+    return this.#fetch(`${ENDPOINTS.META}${realKey}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Error fetching meta: ${response.statusText}`);
@@ -283,7 +283,7 @@ export class Scraper {
       }
     }
     const limited = typeof limit !== "undefined" ? limit : this.#limit;
-    const response = await this.fetch(`${ENDPOINTS.SCRAPE}?limit=${limited}`);
+    const response = await this.#fetch(`${ENDPOINTS.SCRAPE}?limit=${limited}`);
     if (response.status === 403) {
       const text = await response.text();
       throw new Error(`Pastebin blocked you, have you whitelisted your IP? \n\n Response: ${text}`);
@@ -338,5 +338,9 @@ export class Scraper {
     ];
 
     this.#events.post.call(this.#events, callArgs as never);
+  }
+
+  get fetch(): typeof globalThis.fetch {
+    return this.#fetch;
   }
 }
