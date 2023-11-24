@@ -27,34 +27,43 @@ async function update_npm_build_script(): Promise<void> {
   await Deno.writeTextFile(path, updatedFile);
 }
 
+async function update_npm_package(packageName: string, fileContent: string): Promise<string> {
+  try {
+    const npmJSON = await fetch(`https://registry.npmjs.org/${packageName}`).then((r) => r.json());
+    const latest = npmJSON["dist-tags"].latest;
+
+    // Replace the version number in Pastebin.ts
+    const updatedFile = fileContent.replace(
+      new RegExp(`npm:${packageName}@\\d+\\.\\d+\\.\\d+`),
+      `npm:${packageName}@${latest}`,
+    );
+
+    return updatedFile;
+  } catch (error) {
+    console.error(`Error updating version in ${packageName}`);
+    console.error(error);
+  }
+
+  return fileContent;
+}
+
 async function update_npm_packages(): Promise<void> {
   const pastebinPath = `${getDirPath()}/../src/node/Pastebin.ts`;
 
   const pastebinFile = await Deno.readTextFile(pastebinPath);
 
   try {
-    // Find the version number in "npm:node-fetch@x.x.x"
-    const pastebinVersion = (
-      pastebinFile.match(/npm:node-fetch@(\d+\.\d+\.\d+)/) as string[]
-    )[1];
+    // update node-fetch and fast-xml-parser
+    const updatedFile = await update_npm_package("node-fetch", pastebinFile);
+    const updatedFile2 = await update_npm_package("fast-xml-parser", updatedFile);
 
-    const npmJSON = await fetch("https://registry.npmjs.org/node-fetch").then((r) => r.json());
-    const latest = npmJSON["dist-tags"].latest;
-
-    if (pastebinVersion === latest) {
-      console.log("No changes to node/Pastebin.ts package needed.");
+    if (pastebinFile === updatedFile2) {
+      console.log("No changes to npm packages needed.");
       return;
-    } else {
-      console.log(`Updating npm packages from ${pastebinVersion} to ${latest}`);
-
-      // Replace the version number in Pastebin.ts
-      const updatedFile = pastebinFile.replace(
-        /npm:node-fetch@\d+\.\d+\.\d+/,
-        `npm:node-fetch@${latest}`,
-      );
-
-      await Deno.writeTextFile(pastebinPath, updatedFile);
     }
+
+    console.log("Updating npm packages in Pastebin.ts");
+    await Deno.writeTextFile(pastebinPath, updatedFile2);
   } catch (error) {
     console.error("Error updating version in Pastebin.ts");
     console.error(error);

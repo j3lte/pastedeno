@@ -1,7 +1,5 @@
 // Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
 
-import { parse } from "https://deno.land/x/xml@2.1.3/mod.ts";
-
 import {
   ExpirationTime,
   FormatType,
@@ -341,9 +339,12 @@ export abstract class AbstractPastebin {
   }
 
   // Parse
+  parseXML(_xml: string): Record<string, string> {
+    throw new Error("Not implemented!");
+  }
 
   #parseUser(xml: string): User {
-    const data = parse(xml) as { user?: User };
+    const data = this.parseXML(xml) as { user?: User };
     if (isUndefined(data) || isNull(data) || isUndefined(data.user)) {
       throw new Error("No data returned to _parseUser!");
     }
@@ -351,7 +352,9 @@ export abstract class AbstractPastebin {
   }
 
   #parsePastes(xml: string): Paste[] {
-    const { root: data } = parse(`<root>${xml}</root>`) as unknown as { root: { paste: Paste[] } };
+    const { root: data } = this.parseXML(`<root>${xml}</root>`) as unknown as {
+      root: { paste: Paste[] };
+    };
     if (isUndefined(data) || isNull(data) || isUndefined(data.paste)) {
       throw new Error("No data returned to _parsePastes!");
     }

@@ -1,13 +1,24 @@
 // Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
 
 import { AbstractPastebin } from "../lib/Pastebin.ts";
-import { ICreatePasteFileOptions, ICreatePasteTextOptions } from "../lib/interfaces.ts";
+import {
+  ICreatePasteFileOptions,
+  ICreatePasteTextOptions,
+  IPastebinOptions,
+} from "../lib/interfaces.ts";
 
 import fs from "node:fs/promises";
 import { Buffer } from "node:buffer";
 import fetch from "npm:node-fetch@3.3.2";
+import { XMLParser } from "npm:fast-xml-parser@4.3.2";
 
 export class Pastebin extends AbstractPastebin {
+  constructor(config?: IPastebinOptions | string | null) {
+    super(config);
+    // This is probably not the best way to do this, but it works
+    super.parseXML = this.parseXml;
+  }
+
   fetch = fetch as unknown as typeof globalThis.fetch;
 
   async createPasteFromFile(
@@ -39,4 +50,10 @@ export class Pastebin extends AbstractPastebin {
 
     return this.createPaste(pasteOpts);
   }
+
+  parseXml = (xml: string): Record<string, string> => {
+    const parser = new XMLParser();
+    const data = parser.parse(xml);
+    return data;
+  };
 }

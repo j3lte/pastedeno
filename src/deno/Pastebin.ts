@@ -1,9 +1,21 @@
 // Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
 
+import { parse } from "https://deno.land/x/xml@2.1.3/mod.ts";
+
 import { AbstractPastebin } from "../lib/Pastebin.ts";
-import { ICreatePasteFileOptions, ICreatePasteTextOptions } from "../lib/interfaces.ts";
+import {
+  ICreatePasteFileOptions,
+  ICreatePasteTextOptions,
+  IPastebinOptions,
+} from "../lib/interfaces.ts";
 
 export class Pastebin extends AbstractPastebin {
+  constructor(config?: IPastebinOptions | string | null) {
+    super(config);
+    // This is probably not the best way to do this, but it works
+    super.parseXML = this.parseXml;
+  }
+
   /**
    * Create a paste from a file
    *
@@ -40,4 +52,9 @@ export class Pastebin extends AbstractPastebin {
 
     return this.createPaste(pasteOpts);
   }
+
+  parseXml = (xml: string): Record<string, string> => {
+    const data = parse(xml) as unknown as Record<string, string>;
+    return data;
+  };
 }

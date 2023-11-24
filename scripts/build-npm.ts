@@ -30,7 +30,7 @@ await build({
   skipSourceOutput: true,
   // scriptModule: false,
   shims: {
-    deno: true,
+    // deno: true,
   },
   test: false,
   typeCheck: false,
