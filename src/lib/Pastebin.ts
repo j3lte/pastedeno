@@ -39,7 +39,7 @@ export abstract class AbstractPastebin {
   #debug = false;
 
   // VERSION
-  static version = "0.6.0";
+  static version = "0.6.1";
 
   constructor(config?: IPastebinOptions | string | null, options?: {
     fetch?: typeof globalThis.fetch;
