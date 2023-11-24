@@ -33,6 +33,16 @@ Pastebin Client for Deno/Node
 - Get raw paste
 - Get paste metadata
 
+## Packages used
+
+For the Deno version the following packages are used:
+- [xml](https://deno.land/x/xml) (for parsing XML) ([MIT License](https://github.com/lowlighter/xml/blob/main/LICENSE))
+- [evt](https://deno.land/x/evt) (for event handling in Scraper) ([MIT License](https://github.com/garronej/evt/blob/main/LICENSE))
+
+For the Node version the following packages are used:
+- [fast-xml-parser](https://www.npmjs.com/package/fast-xml-parser) (for parsing XML) ([MIT License](https://github.com/NaturalIntelligence/fast-xml-parser/blob/master/LICENSE))
+- [evt](https://www.npmjs.com/package/evt) (for event handling in Scraper) ([MIT License](https://github.com/garronej/evt/blob/main/LICENSE))
+
 ## API
 
 API Docs can be found on Deno Docs: [https://deno.land/x/pastedeno/mod.ts](https://deno.land/x/pastedeno/mod.ts)
