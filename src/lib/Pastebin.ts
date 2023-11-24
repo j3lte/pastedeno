@@ -51,7 +51,7 @@ export abstract class AbstractPastebin {
     if (options?.parseXML) {
       this.#parseXML = options.parseXML;
     } else {
-      this.#parseXML = (xml: string): Record<string, string> => {
+      this.#parseXML = (_xml: string): Record<string, string> => {
         throw new Error("Not implemented!");
       };
     }
