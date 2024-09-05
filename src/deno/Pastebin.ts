@@ -1,4 +1,4 @@
-// Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
+// Copyright 2024 J.W. Lagendijk. All rights reserved. MIT license.
 
 import { parse } from "https://deno.land/x/xml@2.1.3/mod.ts";
 

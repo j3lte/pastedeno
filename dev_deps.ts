@@ -1,4 +1,4 @@
-// Copyright 2023 J.W. Lagendijk. All rights reserved. MIT license.
+// Copyright 2024 J.W. Lagendijk. All rights reserved. MIT license.
 
 export {
   assertEquals,
