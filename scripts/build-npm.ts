@@ -1,6 +1,6 @@
 // Copyright 2024 J.W. Lagendijk. All rights reserved. MIT license.
 
-import { build, emptyDir } from "https://deno.land/x/dnt@0.39.0/mod.ts";
+import { build, emptyDir } from "https://deno.land/x/dnt@0.40.0/mod.ts";
 
 const cleanupTypes = async (dir: string) => {
   for await (const dirEntry of Deno.readDir(dir)) {
@@ -21,9 +21,9 @@ await build({
   entryPoints: ["./src/node/index.ts"],
   outDir: "./npm",
   mappings: {
-    "https://deno.land/x/evt@v2.5.3/mod.ts": {
+    "https://deno.land/x/evt@v2.5.7/mod.ts": {
       name: "evt",
-      version: "2.5.3",
+      version: "2.5.7",
     },
   },
   declaration: "separate",

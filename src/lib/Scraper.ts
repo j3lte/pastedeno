@@ -1,6 +1,6 @@
 // Copyright 2024 J.W. Lagendijk. All rights reserved. MIT license.
 
-import { Evt as Event, to as toEvent } from "https://deno.land/x/evt@v2.5.3/mod.ts";
+import { Evt as Event, to as toEvent } from "https://deno.land/x/evt@v2.5.7/mod.ts";
 
 const ENDPOINTS = {
   SCRAPE: "https://scrape.pastebin.com/api_scraping.php",

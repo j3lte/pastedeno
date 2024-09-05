@@ -1,6 +1,6 @@
 // Copyright 2024 J.W. Lagendijk. All rights reserved. MIT license.
 
-import { parse } from "https://deno.land/x/xml@2.1.3/mod.ts";
+import { parse } from "https://deno.land/x/xml@5.4.16/mod.ts";
 
 import { AbstractPastebin } from "../lib/Pastebin.ts";
 import {

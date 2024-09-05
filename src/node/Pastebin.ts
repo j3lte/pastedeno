@@ -10,7 +10,7 @@ import {
 import fs from "node:fs/promises";
 import { Buffer } from "node:buffer";
 import fetch from "npm:node-fetch@3.3.2";
-import { XMLParser } from "npm:fast-xml-parser@4.3.2";
+import { XMLParser } from "npm:fast-xml-parser@4.5.0";
 
 const parser = new XMLParser();
 
